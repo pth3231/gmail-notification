@@ -13,7 +13,7 @@ import requests
 
 # Ollama configuration
 OLLAMA_API_URL = os.getenv('OLLAMA_API_URL', 'http://localhost:11434/api/generate')
-OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'gemma2:2b')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'gpt-oss:20b-cloud')
 OLLAMA_TIMEOUT = 180  # seconds
 
 
@@ -38,9 +38,8 @@ def summarize_emails(combined_text: str) -> Optional[str]:
         LLM-generated summary or fallback text on error
     """
     try:
-        prompt = f"""Please create a comprehensive summary of the following emails.
-Organize it clearly by numbering each email.
-Include sender, subject, and key information from each email.
+        prompt = f"""Please create a summary of the following emails UNDER 64 words each mail, and UNDER 4MB (megabytes) in total.
+Organize it clearly by numbering each email. Include sender, subject, and key information from each email.
 Output ONLY the summary text, nothing else. Do not use any formatting like JSON or markdown, just plain text.
 Ensure ALL important information is included and not truncated:
 

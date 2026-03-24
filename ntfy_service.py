@@ -61,6 +61,8 @@ def send_notification(title: str, message: str) -> bool:
         )
         response.raise_for_status()
         
+        print("Message: ", message)
+        
         print(f"✓ Sent successfully (HTTP {response.status_code})")
         return True
     except requests.exceptions.Timeout:
