@@ -40,7 +40,9 @@ def send_notification(title: str, message: str) -> bool:
         headers = {
             'Title': cleaning.sanitize_header(title),
             'Tags': 'email,notification',
-            'Content-Type': 'text/plain; charset=utf-8'
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Priority': 'high',
+            'Tags': 'gmail,summary'
         }
         
         # Encode message as UTF-8 bytes
