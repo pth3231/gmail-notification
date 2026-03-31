@@ -27,23 +27,27 @@ main.py                # Entry point (now simplified, uses EmailPipeline)
 ## Key Improvements
 
 ### 1. **Centralized Configuration** (`config.py`)
+
 - All constants and environment variables in one place
 - Easy to customize without modifying code
 - Type hints for all config values
 - Organized by subsystem (Gmail, Ollama, ntfy, cleaning)
 
 ### 2. **Service-Based Architecture**
+
 - **GmailService:** OAuth2 authentication, email fetching
 - **EmailService:** Email extraction, cleaning, combining
 - **LLMService:** Ollama integration for summarization
 - **NotificationService:** ntfy.sh integration
 
 Each service is:
+
 - Independent and reusable
 - Testable in isolation
 - Easy to extend or replace
 
 ### 3. **Pipeline Orchestrator** (`pipeline.py`)
+
 - `EmailPipeline` class manages the complete workflow
 - Clear step-by-step execution with error handling
 - Easy to add scheduling, logging, or additional steps
@@ -56,11 +60,13 @@ success = pipeline.run()
 ```
 
 ### 4. **Simplified Entry Point** (`main.py`)
+
 - Now just 19 lines
 - Clear and maintainable
 - Easy to extend with CLI arguments, config files, etc.
 
 ### 5. **Better Separation of Concerns**
+
 - Config: Settings management
 - Services: Business logic
 - Utils: Helper functions
@@ -79,6 +85,7 @@ success = pipeline.run()
 ## Migration Notes
 
 **No breaking changes:**
+
 - Functionality remains the same
 - Configuration unchanged
 - All environment variables still work

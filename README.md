@@ -6,22 +6,11 @@ Fetch unread Gmail emails, summarize with local Ollama LLM, send via ntfy.sh.
 
 ## Quick Start
 
-1. **Create virtual environment:**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # or venv\Scripts\activate  # Windows
-   ```
-
-2. **Install:** `pip install -r requirements.txt`
-
-3. **Ollama:** `ollama serve` & `ollama pull gemma2:2b`
-
-4. **Gmail API:** Get credentials from [Google Cloud Console](https://console.cloud.google.com) → save as `credentials.json`
-
-5. **Run:** `python main.py`
-
-**For development:** `pip install -r requirements-dev.txt` (adds Jupyter, linting, type checking)
+1. **Install:** See [INSTALL.md](INSTALL.md)
+2. **Ollama:** `ollama serve` & `ollama pull gemma2:2b`
+3. **Gmail API:** Get credentials from [Google Cloud Console](https://console.cloud.google.com) → save as `credentials.json`
+4. **Run:** `python main.py`
+5. **Schedule:** See [INSTALL.md](INSTALL.md#scheduling) for 3-hour automation
 
 ## Pipeline
 
@@ -34,6 +23,7 @@ Fetch unread Gmail emails, summarize with local Ollama LLM, send via ntfy.sh.
 ## Configuration (Optional)
 
 Set environment variables:
+
 ```bash
 OLLAMA_API_URL=http://localhost:11434/api/generate
 OLLAMA_MODEL=gemma2:2b
@@ -44,7 +34,7 @@ NTFY_BASE_URL=https://ntfy.sh
 
 ## Receive Notifications
 
-- **Web:** https://ntfy.sh/gmail-summary
+- **Web:** [https://ntfy.sh/gmail-summary](https://ntfy.sh/gmail-summary)
 - **Mobile:** Install ntfy app, subscribe to `gmail-summary`
 
 ## File Structure
@@ -77,10 +67,12 @@ NTFY_BASE_URL=https://ntfy.sh
 
 ## Code Quality
 
-✓ Type hints throughout
-✓ Comprehensive docstrings
+✓ Type hints throughout  
+✓ Comprehensive docstrings  
 ✓ Clear error messages  
-✓ Refactored for maintainability
+✓ Refactored for maintainability  
+
+See [REFACTORING_SUMMARY.md](REFACTORING_SUMMARY.md) for architectural details.
 
 ## License
 
