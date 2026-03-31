@@ -1,0 +1,17 @@
+# Gmail Notification Service - Core Dependencies
+# Install with: pip install -r requirements.txt
+
+# Gmail API
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.108.0
+
+# HTTP requests
+requests==2.31.0
+
+# HTML parsing and cleaning
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Environment variables (optional, for .env support)
+python-dotenv==1.0.0

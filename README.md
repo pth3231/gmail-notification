@@ -6,10 +6,12 @@ Fetch unread Gmail emails, summarize with local Ollama LLM, send via ntfy.sh.
 
 ## Quick Start
 
-1. **Install:** `pip install google-auth-oauthlib google-auth-httplib2 google-api-python-client requests beautifulsoup4`
+1. **Install:** `pip install -r requirements.txt`
 2. **Ollama:** `ollama serve` & `ollama pull gemma2:2b`
 3. **Gmail API:** Get credentials from [Google Cloud Console](https://console.cloud.google.com) → save as `credentials.json`
 4. **Run:** `python main.py`
+
+**For development:** `pip install -r requirements-dev.txt` (adds Jupyter, linting, type checking)
 
 ## Pipeline
 

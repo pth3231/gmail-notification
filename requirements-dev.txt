@@ -1,0 +1,21 @@
+# Gmail Notification Service - Optional Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Includes core requirements plus optional tools
+-r requirements.txt
+
+# Testing & Jupyter notebooks
+jupyter==1.0.0
+notebook==7.0.6
+ipython==8.18.1
+
+# Scheduling (for future in-app scheduler feature)
+apscheduler==3.10.4
+
+# Code quality & linting
+pylint==3.0.3
+black==23.12.1
+isort==5.13.2
+
+# Type checking
+mypy==1.8.0
