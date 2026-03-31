@@ -6,10 +6,20 @@ Fetch unread Gmail emails, summarize with local Ollama LLM, send via ntfy.sh.
 
 ## Quick Start
 
-1. **Install:** `pip install -r requirements.txt`
-2. **Ollama:** `ollama serve` & `ollama pull gemma2:2b`
-3. **Gmail API:** Get credentials from [Google Cloud Console](https://console.cloud.google.com) → save as `credentials.json`
-4. **Run:** `python main.py`
+1. **Create virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   # or venv\Scripts\activate  # Windows
+   ```
+
+2. **Install:** `pip install -r requirements.txt`
+
+3. **Ollama:** `ollama serve` & `ollama pull gemma2:2b`
+
+4. **Gmail API:** Get credentials from [Google Cloud Console](https://console.cloud.google.com) → save as `credentials.json`
+
+5. **Run:** `python main.py`
 
 **For development:** `pip install -r requirements-dev.txt` (adds Jupyter, linting, type checking)
 
@@ -40,13 +50,15 @@ NTFY_BASE_URL=https://ntfy.sh
 ## File Structure
 
 | File | Purpose |
-|------|--------|
-| `main.py` | Pipeline orchestrator |
-| `gmail_service.py` | Gmail API & authentication |
-| `email_processor.py` | Extract & clean content |
-| `cleaning.py` | Remove URLs, CSS, tracking pixels |
-| `ollama_service.py` | Ollama LLM summarization |
-| `ntfy_service.py` | ntfy.sh notifications |
+| ---- | ------- |
+| `src/config.py` | Centralized configuration & constants |
+| `src/pipeline.py` | Main pipeline orchestrator (EmailPipeline class) |
+| `src/services/gmail.py` | Gmail API service (GmailService class) |
+| `src/services/email.py` | Email processing service (EmailService class) |
+| `src/services/llm.py` | LLM integration service (LLMService class) |
+| `src/services/notification.py` | Notification service (NotificationService class) |
+| `src/utils/cleaning.py` | HTML cleaning & sanitization utilities |
+| `main.py` | Entry point (simplified, uses EmailPipeline) |
 
 ## Troubleshooting
 

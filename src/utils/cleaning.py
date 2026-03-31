@@ -1,5 +1,5 @@
 """
-Email Cleaning - HTML Extraction and Content Sanitization
+Email Cleaning Utilities - HTML Extraction and Content Sanitization
 
 Provides functions to:
 - Extract plain text from HTML email bodies
@@ -10,9 +10,11 @@ Provides functions to:
 
 import base64
 import re
+import unicodedata
 from typing import Optional
 from bs4 import BeautifulSoup
-import unicodedata
+
+from .. import config
 
 
 def extract_email_body(payload: dict) -> str:
@@ -42,7 +44,6 @@ def extract_email_body(payload: dict) -> str:
                 return extract_email_body(part)
             elif part['mimeType'] == 'text/html':
                 html_data = extract_email_body(part)
-                # Use BeautifulSoup to strip HTML and extract clean text
                 soup = BeautifulSoup(html_data, 'html.parser')
                 
                 # Remove style tags and their content FIRST
@@ -66,12 +67,11 @@ def extract_email_body(payload: dict) -> str:
                 
                 # Remove tracking pixels and spacer images
                 for img in soup.find_all('img'):
-                    # Remove tiny images (likely tracking pixels) and images without alt text
                     width = img.get('width', '0')
                     height = img.get('height', '0')
                     try:
-                        if (int(str(width).split('px')[0]) < 10 and 
-                            int(str(height).split('px')[0]) < 10):
+                        if (int(str(width).split('px')[0]) < config.TRACKING_PIXEL_SIZE_THRESHOLD and 
+                            int(str(height).split('px')[0]) < config.TRACKING_PIXEL_SIZE_THRESHOLD):
                             img.decompose()
                     except:
                         if not img.get('alt'):
@@ -84,20 +84,16 @@ def extract_email_body(payload: dict) -> str:
                 # Filter out tracking URLs and web beacons
                 filtered_lines = []
                 for line in lines:
-                    # Skip lines that are only URLs or tracking pixels
                     if line.strip().startswith('http') or line.strip().startswith('www.'):
                         continue
-                    # Skip lines with common footer text
-                    footer_keywords = ['unsubscribe', 'preferences', 'view in browser', 
-                                      'forwarded', 'original message', 'begin forwarded',
-                                      'footer', 'reply to this email', 'change your email']
-                    if any(keyword in line.lower() for keyword in footer_keywords):
+                    if any(keyword in line.lower() for keyword in config.EMAIL_FOOTER_KEYWORDS):
                         continue
                     filtered_lines.append(line)
                 
                 text = '\n'.join(filtered_lines)
                 return text
     return ""
+
 
 def clean_email_content(text: str) -> str:
     """
@@ -121,13 +117,12 @@ def clean_email_content(text: str) -> str:
     if not text:
         return ""
     
-    # AGGRESSIVE URL REMOVAL - match https://, http://, ftp://, www. followed by anything until whitespace
-    # This is the simplest and most effective approach
+    # AGGRESSIVE URL REMOVAL
     text = re.sub(r'https?://[^\s\n]*', '', text, flags=re.IGNORECASE)
     text = re.sub(r'ftp://[^\s\n]*', '', text, flags=re.IGNORECASE)
     text = re.sub(r'www\.[^\s\n]*', '', text, flags=re.IGNORECASE)
     
-    # Remove action prefixes that might be left behind (View job:, etc)
+    # Remove action prefixes
     action_prefixes = ['View job', 'View profile', 'View post', 'Read more', 'See all', 
                        'Click here', 'Edit alert', 'View on', 'Learn more', 'More info',
                        'Apply now', 'Apply here', 'Learn', 'Discover', 'Check out', 'View ',
@@ -135,17 +130,12 @@ def clean_email_content(text: str) -> str:
     for prefix in action_prefixes:
         text = re.sub(rf'\b{prefix}[:\-\s]*\n?', '', text, flags=re.IGNORECASE)
     
-    # AGGRESSIVE CSS REMOVAL - remove ANY {...} patterns (CSS blocks, style definitions, etc)
-    # Use DOTALL to match across newlines within braces
+    # AGGRESSIVE CSS REMOVAL
     text = re.sub(r'\{[^}]*\}', '', text, flags=re.DOTALL)
-    
-    # Remove CSS property patterns (font-size:, padding:, etc.)
     text = re.sub(r'(font|padding|margin|display|color|background|border|width|height|line-height|size|weight|family|style|text)\s*:\s*[^;]*;?', '', text, flags=re.IGNORECASE)
-    
-    # Remove common CSS keywords
     text = re.sub(r'\b(px|pt|em|rem|important|!important|none|block|inline|flex|grid)\b', '', text, flags=re.IGNORECASE)
     
-    # Remove separator lines (lines with just dashes, equals, or underscores)
+    # Remove separator lines
     text = re.sub(r'^-{5,}$', '', text, flags=re.MULTILINE)
     text = re.sub(r'^={5,}$', '', text, flags=re.MULTILINE)
     text = re.sub(r'^_{5,}$', '', text, flags=re.MULTILINE)
@@ -154,32 +144,31 @@ def clean_email_content(text: str) -> str:
     text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '', text)
     
     # Remove HTML entities and special codes
-    text = re.sub(r'&[a-z]+;', '', text, flags=re.IGNORECASE)  # &nbsp; &lt; &gt; etc
-    text = re.sub(r'&#\d+;', '', text)  # &#123; etc
-    text = re.sub(r'&#x[0-9a-fA-F]+;', '', text, flags=re.IGNORECASE)  # &#x1f; etc
+    text = re.sub(r'&[a-z]+;', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'&#\d+;', '', text)
+    text = re.sub(r'&#x[0-9a-fA-F]+;', '', text, flags=re.IGNORECASE)
     
     # Remove lines that are purely whitespace or symbols
     lines = text.split('\n')
     cleaned_lines = []
     for line in lines:
         stripped = line.strip()
-        # Skip empty or whitespace-only lines
         if not stripped:
             continue
-        # Skip lines that are mostly symbols/junk
         if re.match(r'^[\s\.\-_#>+~\*\[\]{};:="\',|()@]+$', stripped):
             continue
         cleaned_lines.append(stripped)
     
     # Aggressively remove excessive newlines
     text = '\n'.join(cleaned_lines)
-    text = re.sub(r'\n\n+', '\n', text)  # Multiple blank lines to single
+    text = re.sub(r'\n\n+', '\n', text)
     
     # Remove excessive spaces
     text = re.sub(r' +', ' ', text)
     text = re.sub(r'\t+', ' ', text)
     
     return text.strip()
+
 
 def sanitize_header(text: str) -> str:
     """
@@ -194,7 +183,5 @@ def sanitize_header(text: str) -> str:
     Returns:
         ASCII-safe header text
     """
-    # Use NFKD normalization to decompose characters
     text = unicodedata.normalize('NFKD', text)
-    # Keep only ASCII characters, replace others with '?'
     return text.encode('ascii', errors='replace').decode('ascii')

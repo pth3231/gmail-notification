@@ -1,48 +1,96 @@
 # Code Refactoring Summary
 
-Codebase refactored for improved readability, maintainability, and professional quality.
+## Major Refactoring - Modular Architecture
+
+The codebase has been restructured from a flat file layout to a modular, object-oriented architecture for better scalability and maintainability.
+
+## New Structure
+
+```
+src/
+├── __init__.py
+├── config.py           # Centralized configuration (constants, env vars)
+├── pipeline.py         # EmailPipeline class (main orchestrator)
+├── services/           # Service classes for different concerns
+│   ├── __init__.py
+│   ├── gmail.py        # GmailService class
+│   ├── email.py        # EmailService class
+│   ├── llm.py          # LLMService class
+│   └── notification.py # NotificationService class
+└── utils/              # Utility functions
+    ├── __init__.py
+    └── cleaning.py     # Email cleaning functions
+
+main.py                # Entry point (now simplified, uses EmailPipeline)
+```
 
 ## Key Improvements
 
-1. **Type Hints** - All functions have parameter, return, and Optional type annotations
+### 1. **Centralized Configuration** (`config.py`)
+- All constants and environment variables in one place
+- Easy to customize without modifying code
+- Type hints for all config values
+- Organized by subsystem (Gmail, Ollama, ntfy, cleaning)
 
-2. **Docstrings** - All modules and functions documented:
-   - Clear summaries and descriptions
-   - Arguments and Returns sections
-   - Process steps and resilience notes
+### 2. **Service-Based Architecture**
+- **GmailService:** OAuth2 authentication, email fetching
+- **EmailService:** Email extraction, cleaning, combining
+- **LLMService:** Ollama integration for summarization
+- **NotificationService:** ntfy.sh integration
 
-3. **Error Handling** - Specific, actionable error messages with suggestions
+Each service is:
+- Independent and reusable
+- Testable in isolation
+- Easy to extend or replace
 
-4. **Variable Naming** - More descriptive names throughout:
-   - `result` → `emails_result`
-   - `service` → `gmail_service_obj`
-   - `combined_text` → `combined_email_text`
+### 3. **Pipeline Orchestrator** (`pipeline.py`)
+- `EmailPipeline` class manages the complete workflow
+- Clear step-by-step execution with error handling
+- Easy to add scheduling, logging, or additional steps
+- Configurable max emails per run
 
-5. **Pipeline Output** - Clear visual structure with:
-   - Section separators: "========== STEP X =========="
-   - Status indicators: ✓ for success, ✗ for failure
-   - Bracketed steps: [Step 1], [Step 2], etc.
+```python
+# Simple usage:
+pipeline = EmailPipeline(max_emails=5)
+success = pipeline.run()
+```
 
-6. **Code Organization** - Better structure:
-   - Constants defined at module level
-   - Helper functions extracted (`_extract_header_value()`)
-   - Consistent formatting and spacing
+### 4. **Simplified Entry Point** (`main.py`)
+- Now just 19 lines
+- Clear and maintainable
+- Easy to extend with CLI arguments, config files, etc.
 
-## Files Updated
-
-| File | Changes |
-| ---- | ------- |
-| main.py | Module docstring, type hints, visual pipeline |
-| gmail_service.py | Full documentation, type hints, auth logic |
-| email_processor.py | Module docs, type hints, helper functions |
-| cleaning.py | Docstrings, type hints, documented regex |
-| ollama_service.py | Full docs, type hints, error handling |
-| ntfy_service.py | Module docs, type hints, better constants |
+### 5. **Better Separation of Concerns**
+- Config: Settings management
+- Services: Business logic
+- Utils: Helper functions
+- Pipeline: Orchestration
 
 ## Benefits
 
-- Easier onboarding for new developers
-- Better IDE support (autocomplete, type checking)
-- Clear, specific error messages
-- Professional code quality
-- No breaking changes to public APIs
+✓ **Modularity** - Easy to modify one service without affecting others
+✓ **Testability** - Each service can be tested independently
+✓ **Reusability** - Services can be used in other projects
+✓ **Extensibility** - Easy to add new services or features
+✓ **Maintainability** - Clear structure, organized code
+✓ **Scalability** - Ready for features like scheduling, logging, monitoring
+✓ **Type Safety** - Full type hints throughout
+
+## Migration Notes
+
+**No breaking changes:**
+- Functionality remains the same
+- Configuration unchanged
+- All environment variables still work
+- OAuth2 tokens still work
+
+## Future Enhancements (Now Easier)
+
+With this structure, adding new features is simpler:
+
+- **Scheduling:** Create `Scheduler` class wrapping `EmailPipeline`
+- **Logging:** Add `Logger` utility and inject into services
+- **Multiple Accounts:** Create service instances for different accounts
+- **Different Notifications:** Create additional `NotificationService` variants
+- **Testing:** Mock each service independently
+- **CLI:** Add argument parser, config file support in `main.py`

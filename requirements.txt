@@ -9,9 +9,8 @@ google-api-python-client==2.108.0
 # HTTP requests
 requests==2.31.0
 
-# HTML parsing and cleaning
+# HTML parsing and cleaning (uses Python's built-in html.parser, no compilation needed)
 beautifulsoup4==4.12.2
-lxml==4.9.3
 
 # Environment variables (optional, for .env support)
 python-dotenv==1.0.0
