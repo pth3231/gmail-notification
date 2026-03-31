@@ -49,7 +49,16 @@ class GmailService:
         if not credentials or not credentials.valid:
             if credentials and credentials.expired and credentials.refresh_token:
                 print("Refreshing expired OAuth token...")
-                credentials.refresh(Request())
+                try:
+                    credentials.refresh(Request())
+                    print("✓ Token refreshed successfully")
+                except Exception as e:
+                    print(f"✗ Token refresh failed: {e}")
+                    print("Initiating new Gmail OAuth2 authentication...")
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        config.CREDENTIALS_FILE, config.GMAIL_SCOPES
+                    )
+                    credentials = flow.run_local_server(port=0)
             else:
                 print("Initiating new Gmail OAuth2 authentication...")
                 flow = InstalledAppFlow.from_client_secrets_file(
