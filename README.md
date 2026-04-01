@@ -1,5 +1,8 @@
 # Gmail Notification Service
 
+<img width="347" height="96" alt="image" src="https://github.com/user-attachments/assets/4afc949c-6219-44e8-8e25-907d0c7cdea6" />
+<img width="386" height="96" alt="image" src="https://github.com/user-attachments/assets/23ed4057-742f-47bb-8066-c13dd6041d15" />
+
 Fetch unread Gmail emails, summarize with local Ollama LLM, send via ntfy.sh.
 
 **Features:** Privacy-first (local processing) • Cleans email content • Summarizes multiple emails • Push notifications
